@@ -28,7 +28,7 @@ export CLOUDSDK_ACTIVE_CONFIG_NAME=default  # see the note above
 .acme.sh/acme.sh --issue --dns dns_gcloud -d $FQDN
 
 # Wait for user's confirmation
-read -n1 -r -p "Press any key to continue..." anykey
+read -n1 -r -p "Hit ^C to abort or press anykey to confirm that a certificate is available..." anykey
 
 # Overwrite the default virtual host configurations
 sudo cp $(dirname "$0")/000-default.conf /etc/apache2/sites-available/000-default.conf

@@ -1,8 +1,9 @@
 # Building and maintaining an *Observium* appliance
 
-The two motivations for this project are:
+The motivations for this project are:
 - demonstrate that the appliance is built from distribution;
 - install Let's Encrypt certificates from the DNS API instead of relying on http/https ports.
+- integrate a log collector into this appliance
 
 Note: all the scripts in this project should be downloaded in the local system and are presumed to be available at each stage of this implementation.
 
@@ -50,7 +51,7 @@ Using SCP, copy the script UpdateAll.sh to the user account home directory :
 ````
 scp UpdateAll.sh <UserName@ServerIP>:/home/<UserName>/
 ````
-Using SSH, login the server and type the following commands (there is a largee volume of output and it is saved for debugging purposes):
+Using SSH, login the server and type the following commands (there is a large volume of output and it is saved for debugging purposes):
 ````
 sudo -i
 script step1.log
@@ -72,10 +73,10 @@ Review the script here: *[Scripts/UpdateAll.sh](https://github.com/SergeCaron/ob
 This script installs Observium, postfix, and acme.sh: the order is important ;).
 
 The install script for both Observium and acme.sh are downloaded from their respective website at runtime. This is a long running script that will ask for:
-- the email address of the user (administrator)
+- the email address of the user (administrator) registered with *Let's Encrypt*
 - Observium installation details:
   - the Observium version you intend to install ("Community Edition" is presumed here)
-  - a password for the MySQL root
+  - a password for the MySQL *root* administrator. **This password is required to restore a database on this system.**
   - a confirmation to add component 'universe' to all repositories
   - a confirmation to add component 'multiverse' to all repositories
   - a confirmation to install all required libraries
@@ -94,7 +95,7 @@ Using SCP, copy the script InteractiveInstall.sh to the user account home direct
 ````
 scp InteractiveInstall.sh <UserName@ServerIP>:/home/<UserName>/
 ````
-Using SSH, login the server and type the following commands (again, there is a largee volume of output and it is saved for debugging purposes):
+Using SSH, login the server and type the following commands (again, there is a large volume of output and it is saved for debugging purposes):
 ````
 sudo -i
 script step2.log
@@ -104,6 +105,9 @@ exit	# Exit script
 exit	# Exit root
 sudo reboot
 ````
+Please be patient... this is a long running install.
+
+
 Review the script here: *[Scripts/InteractiveInstall.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/InteractiveInstall.sh)*
 
 
@@ -141,6 +145,8 @@ Their virtual host declaration is:
 
 acme.sh documents their API in *[How to use DNS API](https://github.com/acmesh-official/acme.sh/wiki/dnsapi)*.
 
+DNS settings such as host records (A/AAAA) and Certification Authority Authorization (CAA) records should be properly setup before attempting this step.
+
 This script will install an automatically renewed certificate every 60 days using an API defined by your DNS supplier.
 
 This is a per-DNS service implementation. For example, to issue a certificate using EasyDNS.net, the sequence is:
@@ -165,12 +171,12 @@ Using SCP, copy the script InteractiveInstall.sh and the 000-default.conf file t
 scp CertificateInstall.sh <UserName@ServerIP>:/home/<UserName>/
 scp 000-default.conf <UserName@ServerIP>:/home/<UserName>/
 ````
-Using SSH, login the server and type the following commands (again, there is a largee volume of output and it is saved for debugging purposes):
+Using SSH, login the server and type the following commands (again, there is a large volume of output and it is saved for debugging purposes):
 ````
 sudo -i
 script step3.log
 chmod +x /home/$SUDO_USER/CertificateInstall.sh
-vi /home/$SUDO_USER/CertificateInstall.sh
+vi /home/$SUDO_USER/CertificateInstall.sh   # this is a place holder for your favorite editor
 /home/$SUDO_USER/CertificateInstall.sh
 exit	# Exit script
 exit	# Exit root
@@ -272,6 +278,8 @@ The output of the script is:
 External email address where postmaster's and root's mail is redirected [<email address provided to Let's Encrypt>]:
 Creating aliases...
 Sending a test message...
+Sending a test message from the php transport...
+Accepted
 -----------------------------------------------------------
 After editing, these parameters differ from the default configuration:
 
@@ -308,7 +316,7 @@ Done!
 
 </details>
 
-<details><summary>(Optional) Step 5: Install and configure syslog-ng</summary>
+<details><summary>(Optional) Step 5: Install/configure syslog-ng and verify open ports on this appliance</summary>
 
 Install a log collector: see **[Observium's Syslog Integration](https://docs.observium.org/syslog/)** for a complete description of this feature.
 
@@ -358,11 +366,40 @@ Observium suggested edits (in two groups) are:
 Using SSH, login the server and type the following commands:
 ````
 sudo apt install syslog-ng
-sudo <your favorite editor> /etc/syslog-ng/syslog-ng.conf
+sudo <your favorite editor> /etc/syslog-ng/syslog-ng.conf  # Insert/Replace the lines marked with +-
 sudo service syslog-ng restart
 sudo lsof -i -nP
 ````
-The last line verifies open ports on the server.
+The last line verifies open ports on the server. It should look like this:
+````
+COMMAND    PID              USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+systemd-n  677   systemd-network   18u  IPv4  35292      0t0  UDP <IP>:68
+systemd-r  679   systemd-resolve   13u  IPv4  40011      0t0  UDP 127.0.0.53:53
+systemd-r  679   systemd-resolve   14u  IPv4  40012      0t0  TCP 127.0.0.53:53 (LISTEN)
+snmpd      735       Debian-snmp    6u  IPv4  35549      0t0  UDP 127.0.0.1:161
+sshd       789              root    3u  IPv4  35478      0t0  TCP *:22 (LISTEN)
+sshd       789              root    4u  IPv6  35480      0t0  TCP *:22 (LISTEN)
+mysqld    1448             mysql   32u  IPv4  42220      0t0  TCP 127.0.0.1:33060 (LISTEN)
+mysqld    1448             mysql   71u  IPv4  43086      0t0  TCP 127.0.0.1:3306 (LISTEN)
+apache2   4379              root    4u  IPv6  49954      0t0  TCP *:80 (LISTEN)
+apache2   4379              root    6u  IPv6  49958      0t0  TCP *:443 (LISTEN)
+apache2   4380          www-data    4u  IPv6  49954      0t0  TCP *:80 (LISTEN)
+apache2   4380          www-data    6u  IPv6  49958      0t0  TCP *:443 (LISTEN)
+apache2   4381          www-data    4u  IPv6  49954      0t0  TCP *:80 (LISTEN)
+apache2   4381          www-data    6u  IPv6  49958      0t0  TCP *:443 (LISTEN)
+apache2   4382          www-data    4u  IPv6  49954      0t0  TCP *:80 (LISTEN)
+apache2   4382          www-data    6u  IPv6  49958      0t0  TCP *:443 (LISTEN)
+apache2   4383          www-data    4u  IPv6  49954      0t0  TCP *:80 (LISTEN)
+apache2   4383          www-data    6u  IPv6  49958      0t0  TCP *:443 (LISTEN)
+apache2   4384          www-data    4u  IPv6  49954      0t0  TCP *:80 (LISTEN)
+apache2   4384          www-data    6u  IPv6  49958      0t0  TCP *:443 (LISTEN)
+xinetd    5462              root    5u  IPv6  52089      0t0  TCP *:36602 (LISTEN)
+master    6718              root   13u  IPv4  60885      0t0  TCP 127.0.0.1:25 (LISTEN)
+master    6718              root   14u  IPv6  60886      0t0  TCP [::1]:25 (LISTEN)
+master    6718              root   18u  IPv4  60890      0t0  TCP 127.0.0.1:465 (LISTEN)
+syslog-ng 9192              root   11u  IPv4  82184      0t0  UDP *:514
+````
+
 
 Finally, login your Observium appliance and enable syslog in the *Settings* configuration GUI. ![Enable_Syslog](./Resources/Enable_Syslog.jpg)
 </details>
@@ -403,6 +440,55 @@ The backup completes and displays the "Press any key to continue..." prompt.
 
 Review the script here:  *[Scripts/Backup.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/Backup.sh)*
 
+Note: you can create a backup of this appliance by connecting to itself.
+<details><summary>Here is a sample log:</summary>
+
+````
+Remote Observium installation directory [/opt/observium]:
+Enter remote Observium user and server in the form user@<IP Address>: administrateursbs@127.0.0.1
+
+Copying the remote Observium server data. The local user password may be required twice:
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/administrateursbs/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/administrateursbs/.ssh/id_rsa
+Your public key has been saved in /home/administrateursbs/.ssh/id_rsa.pub
+The key fingerprint is:
+SHA256:qUhXDwILD13YLu0fvC/0Ci1hTRtgGAmED8qzIgYXWts administrateursbs@observium
+The key's randomart image is:
++---[RSA 3072]----+
+| o=ooB+          |
+|o o+=+..         |
+|o= +oo. =        |
+|+o+ E o= *       |
+|..o .o+.S .      |
+|oo . +.++        |
+|+   . +o.+       |
+|       o+ .      |
+|        .+.      |
++----[SHA256]-----+
+The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+ED25519 key fingerprint is SHA256:hIJ7tVGSkocFk0bJH6OO6U8emE1Ilw0o7VHZ37Ist/8.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '127.0.0.1' (ED25519) to the list of known hosts.
+administrateursbs@127.0.0.1's password:
+administrateursbs@127.0.0.1's password:
+Creating backup files on the source Observium server ...
+config.php                                                                            100% 1459     1.4MB/s   00:00
+Enter password: ... database dump completed.
+ ... rrd data compression completed.
+
+Copying backup files from the remote Observium server ...
+observium-rrd.tar.gz                                                                  100%  153KB 137.1MB/s   00:00
+observium-dump.sql                                                                    100%  191KB  19.4MB/s   00:00
+ ... done!
+
+Press any key to continue...
+````
+
+</details>
 
 # Restoring the Observium installation
 
@@ -416,7 +502,7 @@ This is a destructive operation. Current contents of the Observium database and 
 
 This script **must** run as *root*. The script handles the mundane stuff such as adjusting database credentials and name (!) in the configuration file from the backup. The user is then invited to review discrepancies between this file  and the configuration file from the running Observium installation. The user decides to overwrite the configuration file or not. In any case, the credentials and name of the running Observium *mysql* database are used to restore the backup and the file can be edited later on if need be.
 
-Using SSH, login the server and type the following commands (once again, there is a largee volume of output and it is saved for debugging purposes):
+Using SSH, login the server and type the following commands (once again, there is a large volume of output and it is saved for debugging purposes):
 ````
 script restore.log
 chmod +x Restore.sh

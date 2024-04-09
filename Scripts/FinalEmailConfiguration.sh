@@ -32,7 +32,7 @@ echo "This message 1/2" | mail -s "Test message to the administrator" $email
 echo "This message 2/2" | mail -s "Test message redirected from root" root
 
 echo "Sending a test message from the php transport..."
-php -r 'echo mail("root@localhost", "Test email", "Sent using PHP transport\r\n") ? "Accepted\r\n" : "Error\r\n";'
+php -r "echo mail('$email', 'Test email', \"Sent using PHP transport\r\n\") ? \"Accepted\r\n\" : \"Error\r\n\";"
 
 
 echo "-----------------------------------------------------------"
