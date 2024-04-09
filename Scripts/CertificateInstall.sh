@@ -18,8 +18,7 @@
 
 read -p "Enter the email address of the administrator of this domain: " ThisAdmin
 ThisDomain=$(echo $ThisAdmin | sed -e "s/^.*@//" | tr -d "[:blank:]")
-#ThisHost=$(hostname)
-ThisHost=observium
+ThisHost=$(hostname)
 FQDN=$ThisHost.$ThisDomain
 echo "A certificate will be requested for" $FQDN
 

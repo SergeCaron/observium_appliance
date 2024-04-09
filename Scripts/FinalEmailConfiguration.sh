@@ -31,6 +31,10 @@ echo "Sending a test message..."
 echo "This message 1/2" | mail -s "Test message to the administrator" $email
 echo "This message 2/2" | mail -s "Test message redirected from root" root
 
+echo "Sending a test message from the php transport..."
+php -r 'echo mail("root@localhost", "Test email", "Sent using PHP transport\r\n") ? "Accepted\r\n" : "Error\r\n";'
+
+
 echo "-----------------------------------------------------------"
 echo "After editing, these parameters differ from the default configuration:"
 echo ""
