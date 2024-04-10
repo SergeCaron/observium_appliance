@@ -255,7 +255,7 @@ smtp_tls_security_level=secure
 ````
 - and save the file. Use the command "sudo dpkg-reconfigure postfix" to configure other parameters. Otherwise after modifying main.cf, be sure to run 'systemctl reload postfix'. 
 
-Finally, an external email address must be provided to redirect emails to postmaster and to root. This email address is tested once by itself and thenredirection is  tested.
+Finally, an external email address must be provided to redirect emails to postmaster and to root. This email address is tested once by itself and then redirection is  tested. A third email is sent using the PHP transport thaat is used by default in *Observium*.
 These tests are carried out as the Observium user, not root and the emails should appear with the name supplied in Step 0. 
 A summary of variances from the default configuration is also printed for review. In case of doubt, *[see this configuration guide](https://wiki.archlinux.org/title/Postfix)*.
 
@@ -441,21 +441,21 @@ The backup completes and displays the "Press any key to continue..." prompt.
 Review the script here:  *[Scripts/Backup.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/Backup.sh)*
 
 Note: you can create a backup of this appliance by connecting to itself.
-<details><summary>Here is a sample log:</summary>
+<details><summary>Here is a sample log invoked by user localadminaccount:</summary>
 
 ````
 Remote Observium installation directory [/opt/observium]:
-Enter remote Observium user and server in the form user@<IP Address>: administrateursbs@127.0.0.1
+Enter remote Observium user and server in the form user@<IP Address>: localadminaccount@127.0.0.1
 
 Copying the remote Observium server data. The local user password may be required twice:
 Generating public/private rsa key pair.
-Enter file in which to save the key (/home/administrateursbs/.ssh/id_rsa):
+Enter file in which to save the key (/home/localadminaccount/.ssh/id_rsa):
 Enter passphrase (empty for no passphrase):
 Enter same passphrase again:
-Your identification has been saved in /home/administrateursbs/.ssh/id_rsa
-Your public key has been saved in /home/administrateursbs/.ssh/id_rsa.pub
+Your identification has been saved in /home/localadminaccount/.ssh/id_rsa
+Your public key has been saved in /home/localadminaccount/.ssh/id_rsa.pub
 The key fingerprint is:
-SHA256:qUhXDwILD13YLu0fvC/0Ci1hTRtgGAmED8qzIgYXWts administrateursbs@observium
+SHA256:qUhXDwILD13YLu0fvC/0Ci1hTRtgGAmED8qzIgYXWts localadminaccount@observium
 The key's randomart image is:
 +---[RSA 3072]----+
 | o=ooB+          |
@@ -473,8 +473,8 @@ ED25519 key fingerprint is SHA256:hIJ7tVGSkocFk0bJH6OO6U8emE1Ilw0o7VHZ37Ist/8.
 This key is not known by any other names
 Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 Warning: Permanently added '127.0.0.1' (ED25519) to the list of known hosts.
-administrateursbs@127.0.0.1's password:
-administrateursbs@127.0.0.1's password:
+localadminaccount@127.0.0.1's password:
+localadminaccount@127.0.0.1's password:
 Creating backup files on the source Observium server ...
 config.php                                                                            100% 1459     1.4MB/s   00:00
 Enter password: ... database dump completed.
@@ -509,6 +509,8 @@ chmod +x Restore.sh
 sudo ./Restore.sh
 exit	# Exit script
 ````
+Given a user name of *localadminaccount* and a system name of *observium*, the discrepencies are displayed using *less*: ![Show_Discrepencies](./Resources/Restore_Review_Variances.jpg) and the confirmation prompt appears on exit.
+
 Review the script here:  *[Scripts/Restore.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/Restore.sh)*
 
 

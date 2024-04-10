@@ -88,8 +88,6 @@ sed -i "$pattern" $BackupDirectory/configcandidate.php
 pattern='s/'${remote_db_name}'/'${local_db_name}'/g'
 sed -i "$pattern" $BackupDirectory/configcandidate.php
 echo 
-#echo "Please note the new database name and credentials in case this process fails:"
-#diff -c -b $LocalDirectory/config.php $BackupDirectory/configcandidate.php 
 cat <(echo "Please review configuration variances:") \
     <(echo "--------------------------------------") \
 	<(echo) \
