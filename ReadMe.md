@@ -514,6 +514,18 @@ exit	# Exit script
 ````
 Given a user name of *localadminaccount* and a system name of *observium*, the discrepencies are displayed using *less*: ![Show_Discrepencies](./Resources/Restore_Review_Variances.jpg) and the confirmation prompt appears on exit.
 
+Quoting directly from *[Observium's Updating page](https://docs.observium.org/updating/#upgrade-to-latest-major-release)*:
+- Update DB schema:
+
+````
+/opt/observium/discovery.php -u
+````
+
+- If it has been a very long time since you've updated (12 months or more), you may want to force an immediate rediscovery of all devices to make sure things are up to date :
+````
+/opt/observium/discovery.php -h all
+````
+
 Review the script here:  *[Scripts/Restore.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/Restore.sh)*
 
 
