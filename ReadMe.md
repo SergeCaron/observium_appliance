@@ -500,6 +500,9 @@ The requirements are:
 
 This is a destructive operation. Current contents of the Observium database and the RRD directory are deleted prior to restoration.
 
+**A word of caution: a new Observium install is not necessarily compatible with the old installation database. For example, I was no longer able to log into a new install that was approximately 1000 revisions apart from the old one (upgrading from Observium CE	22.5.12042 (24th May 2022) to Observium CE	23.9.13005 (16th September 2023)). Make sure you have a backup of the target server in case you need to revert the restore operation.**
+
+
 This script **must** run as *root*. The script handles the mundane stuff such as adjusting database credentials and name (!) in the configuration file from the backup. The user is then invited to review discrepancies between this file  and the configuration file from the running Observium installation. The user decides to overwrite the configuration file or not. In any case, the credentials and name of the running Observium *mysql* database are used to restore the backup and the file can be edited later on if need be.
 
 Using SSH, login the server and type the following commands (once again, there is a large volume of output and it is saved for debugging purposes):
