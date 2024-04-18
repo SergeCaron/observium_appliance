@@ -631,4 +631,4 @@ Done!
 ````
 </details>
 
-Review the script here:  *[Scripts/Restore.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/Restore.sh)*
+Review the script here:  *[Scripts/Upgrade.sh](https://github.com/SergeCaron/observium_appliance/blob/b797c7fb51e2ffa894fdc7da138e8831be0480b6/Scripts/Upgrade.sh)*
