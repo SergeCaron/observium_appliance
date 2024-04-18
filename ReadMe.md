@@ -7,6 +7,14 @@ The motivations for this project are:
 
 Note: all the scripts in this project should be downloaded in the local system and are presumed to be available at each stage of this implementation.
 
+### This ReadMe is divided in four sections:
+- [Build a new observium appliance](#Build-a-new-observium-appliance)
+- [Backing up the Observium database](#Backing-up-the-Observium-database)
+- [Restoring the Observium installation](#Restoring-the-Observium-installation)
+- [Inplace upgrade to the latest Community Edition](#Inplace-upgrade-to-the-latest-Community-Edition)
+
+
+
 
 # Build a new observium appliance
 
@@ -528,4 +536,99 @@ Quoting directly from *[Observium's Updating page](https://docs.observium.org/up
 
 Review the script here:  *[Scripts/Restore.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/Restore.sh)*
 
+# Inplace upgrade to the latest Community Edition
 
+This is a direct quote from the *[Observium web site](https://docs.observium.org/updating/)*: "Observium has been designed from its initial inception to be easy and seamless to upgrade. We recommend keeping Community Edition installations updated to the latest version and updating Subscription Edition installations at least once per month."
+
+The Community Edition latest release is documented **[here](https://www.observium.org/)**. According to their documentation, *the Community Edition receives updates and new features on a 12 to 6-monthly release cycle*. You should plan your upgrades accordingly.
+
+The upgrade script:
+- ask for confirmation before deleting a previous backup of the software
+- downloads the latest Observium Community Edition release
+- stops the CRON scheduler
+- creates a backup compatible with the *[Restoring the Observium installation](#Restoring-the-Observium-installation)* section above (in case of ...)
+- installs the lates edition and upgrades the database schema
+- confirm that you want to force an immediate rediscovery of all devices: this is a long running process
+- restarts the CRON scheduler
+
+
+
+Using SSH, login the server and type the following commands (there is a large volume of output and it is saved for debugging purposes):
+````
+sudo -i
+script upgrade.log
+chmod +x /home/$SUDO_USER/Upgrade.sh
+/home/$SUDO_USER/Upgrade.sh
+exit	# Exit script
+exit	# Exit root
+````
+
+<details><summary>Here is a sample log:</summary>
+
+````
+
+Local Observium installation directory [/opt/observium]: 
+There is a previous backup of the Observium installation in /opt/observium_old.
+If you continue, this backup will be removed. Hit ^C to abort ...
+
+--2024-04-18 14:29:53--  https://www.observium.org/observium-community-latest.tar.gz
+Resolving www.observium.org (www.observium.org)... 144.76.112.154
+Connecting to www.observium.org (www.observium.org)|144.76.112.154|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 123667068 (118M) [application/x-gzip]
+
+Saving to: ‘observium-community-latest.tar.gz’
+
+observium-community-latest.ta   0%[                                                  ]       0  --.-KB/s               
+observium-community-latest.ta   0%[                                                  ]  24.00K   111KB/s               
+[ ... snip ... ]
+observium-community-latest.ta  97%[===============================================>  ] 115.45M  17.6MB/s    eta 3s     
+observium-community-latest.ta 100%[=================================================>] 117.94M  18.3MB/s    in 20s     
+
+2024-04-18 14:30:13 (5.87 MB/s) - ‘observium-community-latest.tar.gz’ saved [123667068/123667068]
+
+
+Stopping CRON...
+... CRON must be manually restarted if this upgrade is aborted.
+
+Creating backup files on the source Observium server ...
+NOTE: the database password is available in plain text in Observium's configuration file.
+      You can safely disregard the mysqldump [Warning].
+mysqldump: [Warning] Using a password on the command line interface can be insecure.
+ ... database dump completed.
+tar: rrd/semaine1/ping.rrd: file changed as we read it
+tar: rrd/stoic/uptime.rrd: file changed as we read it
+ ... rrd data compression completed.
+
+ ... done!
+
+Abort if the backup is not successful ...
+/opt ~
+observium/
+observium/poller-wrapper.py
+[ ... snip ... ]
+observium/.phpcs.xml
+observium/poller.php
+~
+
+  ___   _                              _
+ / _ \ | |__   ___   ___  _ __ __   __(_) _   _  _ __ ___
+| | | || '_ \ / __| / _ \| '__|\ \ / /| || | | || '_ ` _ \
+| |_| || |_) |\__ \|  __/| |    \ V / | || |_| || | | | | |
+ \___/ |_.__/ |___/ \___||_|     \_/  |_| \__,_||_| |_| |_|
+                     Observium Community Edition 23.9.13005
+                                  https://www.observium.org
+-- Database is up to date.
+-- Observium is up to date.
+
+Forcing a rediscovery of all devices is a long process recommended
+if it has been a very long time since you've updated.
+Force an immediate rediscovery of all devices to make sure things are up to date? [N/y]
+
+Starting CRON...
+Done!
+
+````
+</details>
+
+Review the script here:  *[Scripts/Restore.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/Restore.sh)*
