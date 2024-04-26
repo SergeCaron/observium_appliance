@@ -15,7 +15,7 @@ Note: all the scripts in this project should be downloaded in the local system a
 
 ### Bonus
 
-You can build [a standalone Observium server with fault tolerant network connection](A-standalone-Observium-server-with-fault-tolerant-network-connection).
+You can build [a standalone Observium server with fault tolerant network connection](#A-standalone-Observium-server-with-fault-tolerant-network-connection).
 
 **Disclaimer:** this project has no relationship with Observium, Ubuntu, and/or Boingfire. All trademarks and copyrights are the property of their respective owners.
 
