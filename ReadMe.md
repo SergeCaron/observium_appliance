@@ -655,7 +655,7 @@ menuentry "Install Ubuntu Server (Serial)" {
 }
 ````
 
-- Bonding of the two network interfaces is done early in the Ubuntu 22.04 LTS installation process. The bonding mode "active-backup" must be selected to obtain a fault-tolerantconfiguration. See the details below:<details><summary>Select Active-Backup configuration></summary> ![BFN1K_Bonding](./Resources/BFN1K_Bonding.jpg)</details>
+- Bonding of the two network interfaces is done early in the Ubuntu 22.04 LTS installation process. The bonding mode "active-backup" must be selected to obtain a fault-tolerant configuration. See the details below:<details><summary>Select Active-Backup configuration></summary> ![BFN1K_Bonding](./Resources/BFN1K_Bonding.jpg)</details>
 The Ubuntu 22.04 installer creates a configuration with a missing parameter. According to *[Netplan's YAML Configuration Guide](https://netplan.readthedocs.io/en/latest/netplan-yaml/)*, the default value of the **mii-monitor-interval** parameter is zero, which disables monitoring carrier on each interface. The parameter **MUST** be added to the /etc/netplan/00-installer-config.yaml configuration. Indentation must be respected: this is shown here for the default configuration produced by the installer for this system:
 ````
 # This is the network config written by 'subiquity'
