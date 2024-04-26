@@ -13,7 +13,11 @@ Note: all the scripts in this project should be downloaded in the local system a
 - [Restoring the Observium installation](#Restoring-the-Observium-installation)
 - [Inplace upgrade to the latest Community Edition](#Inplace-upgrade-to-the-latest-Community-Edition)
 
+### Bonus
 
+You can build [a standalone Observium server with fault tolerant network connection](A-standalone-Observium-server-with-fault-tolerant-network-connection).
+
+**Disclaimer:** this project has no relationship with Observium, Ubuntu, and/or Boingfire. All trademarks and copyrights are the property of their respective owners.
 
 
 # Build a new observium appliance
@@ -632,3 +636,84 @@ Done!
 </details>
 
 Review the script here:  *[Scripts/Upgrade.sh](https://github.com/SergeCaron/observium_appliance/blob/b797c7fb51e2ffa894fdc7da138e8831be0480b6/Scripts/Upgrade.sh)*
+
+# A standalone Observium server with fault tolerant network connection
+
+*Observium*'s hardware requirements are explained in *[Hardware Scaling](https://docs.observium.org/hardware_scaling/)*. The hardware selected here should handle a medium sized network but your mileage may vary.
+
+The Boingfire BFN1K is a headless computer driven by a serial console shown on the right in this picture:![Boingfire_BFN1K](./Resources/Boingfire_BFN1K.jpg).
+
+Boingfire provides the BFFTDICON console cable and recommends using *putty* to configure the BIOS and boot the system.
+
+Ubuntu 22.04 LTS is used to build this particular installation. There are two caveats:
+- The Ubuntu Server ISO has no provision to boot from a serial console. A utility to create a USB UEFI bootable key from this ISO is required to be able to edit the bootloader (Grub) configuration. Select a utility that will create a FAT partition on a USB flash drive, transferring the image files to it, and then generating a bootloader to make the partition bootable. Edit the file /boot/grub/grub.cfg and add the following menu entry before the *"Try or Install Ubuntu Server"* menuentry:
+````
+menuentry "Install Ubuntu Server (Serial)" {
+	set gfxpayload=keep
+	linux	/casper/vmlinuz   file=/cdrom/preseed/ubuntu-server.seed vga=normal console=tty0 console=ttyS0,115200n8 ---
+	initrd	/casper/initrd
+}
+````
+
+- Bonding of the two network interfaces is done early in the Ubuntu 22.04 LTS installation process. The bonding mode "active-backup" must be selected to obtain a fault-tolerantconfiguration. See the details below:<details><summary>Select Active-Backup configuration></summary> ![BFN1K_Bonding](./Resources/BFN1K_Bonding.jpg)</details>
+The Ubuntu 22.04 installer creates a configuration with a missing parameter. According to *[Netplan's YAML Configuration Guide](https://netplan.readthedocs.io/en/latest/netplan-yaml/)*, the default value of the **mii-monitor-interval** parameter is zero, which disables monitoring carrier on each interface. The parameter **MUST** be added to the /etc/netplan/00-installer-config.yaml configuration. Indentation must be respected: this is shown here for the default configuration produced by the installer for this system:
+````
+# This is the network config written by 'subiquity'
+network:
+  bonds:
+    bond0:
+      dhcp4: true
+      interfaces:
+      - enp2s0
+      - enp3s0
+      parameters:
+        mode: active-backup
+        mii-monitor-interval: 100
+  ethernets:
+    enp2s0: {}
+    enp3s0: {}
+  version: 2
+~
+````
+
+The behavior of the bond can be tested before you proceed with the rest of the Observium appliance installation. Care should be taken to assign a static IP to the bond as devices using this appliance will typically be configured to send data to an IP address, not a host name.
+
+The Media Independent Interface (MII) is reported by the bonding driver using the command "cat /proc/net/bonding/bond0". This shows the link status and the active slave:
+````
+root@observium:~# cat /proc/net/bonding/bond0
+Ethernet Channel Bonding Driver: v5.15.0-105-generic
+
+Bonding Mode: fault-tolerance (active-backup)
+Primary Slave: None
+Currently Active Slave: enp3s0
+MII Status: up
+MII Polling Interval (ms): 0
+Up Delay (ms): 0
+Down Delay (ms): 0
+Peer Notification Delay (ms): 0
+
+Slave Interface: enp3s0
+MII Status: up
+Speed: 1000 Mbps
+Duplex: full
+Link Failure Count: 0
+Permanent HW addr: 1c:ae:3e:e4:94:25
+Slave queue ID: 0
+
+Slave Interface: enp2s0
+MII Status: up
+Speed: 1000 Mbps
+Duplex: full
+Link Failure Count: 0
+Permanent HW addr: 1c:ae:3e:e4:94:24
+Slave queue ID: 0
+root@observium:~#
+
+````
+Strangely, the MAC address of the bond is not shown. That is what is presented to each network device connected to this appliance:
+````
+root@observium:~$ ip link show bond0
+4: bond0: <BROADCAST,MULTICAST,MASTER,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+    link/ether 26:77:7a:bf:41:e4 brd ff:ff:ff:ff:ff:ff
+````
+The MAC address of the bonded interface is 26:77:7a:bf:41:e4.
