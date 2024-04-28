@@ -538,6 +538,8 @@ Quoting directly from *[Observium's Updating page](https://docs.observium.org/up
 /opt/observium/discovery.php -h all
 ````
 
+*Observium* has device specific migration notes, in particular for *[Linux](https://docs.observium.org/device_linux/)*. During installation, the SNMP package generates a random readonly community name which must be reflected in the configuraton of the device representing the Observium server. This is typically *localhost*. The unique community string is found in */etc/snmp/snmpd.conf* and is updated in the device's property page under *SNMP v1/v2c Authentication*.
+
 Review the script here:  *[Scripts/Restore.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/Restore.sh)*
 
 # Inplace upgrade to the latest Community Edition
