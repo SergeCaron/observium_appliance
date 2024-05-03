@@ -177,7 +177,7 @@ The *apache* virtual host declaration installed by *Observium* is replaced durin
 
 Review this host declaration here: *[Scripts/000-default.conf](https://github.com/SergeCaron/observium_appliance/blob/19455a0ae3509b86e2f70b229be102fdd297f375/Scripts/000-default.conf)*
 
-Using SCP, copy the script InteractiveInstall.sh and the 000-default.conf file to the user account home directory :
+Using SCP, copy the script CertificateInstall.sh and the 000-default.conf file to the user account home directory :
 
 ````
 scp CertificateInstall.sh <UserName@ServerIP>:/home/<UserName>/
@@ -435,7 +435,7 @@ According to Observium, that is all that is required to restore the live install
 
 Using SCP, copy the script Backup.sh to the user account home directory :
 ````
-scp FinalEmailConfiguration.sh <UserName@ServerIP>:/home/<UserName>/
+scp Backup.sh <UserName@ServerIP>:/home/<UserName>/
 ````
 Using SSH, login the local system and invoke the script (privileges are not required on the *local* system):
 ````
@@ -517,6 +517,10 @@ This is a destructive operation. Current contents of the Observium database and 
 
 This script **must** run as *root*. The script handles the mundane stuff such as adjusting database credentials and name (!) in the configuration file from the backup. The user is then invited to review discrepancies between this file  and the configuration file from the running Observium installation. The user decides to overwrite the configuration file or not. In any case, the credentials and name of the running Observium *mysql* database are used to restore the backup and the file can be edited later on if need be.
 
+Using SCP, copy the script Restore.sh to the user account home directory :
+````
+scp Restore.sh <UserName@ServerIP>:/home/<UserName>/
+````
 Using SSH, login the server and type the following commands (once again, there is a large volume of output and it is saved for debugging purposes):
 ````
 script restore.log
@@ -557,6 +561,10 @@ The upgrade script:
 - confirm that you want to force an immediate rediscovery of all devices: this is a long running process
 - restarts the CRON scheduler
 
+Using SCP, copy the script Upgrade.sh to the user account home directory :
+````
+scp Upgrade.sh <UserName@ServerIP>:/home/<UserName>/
+````
 
 
 Using SSH, login the server and type the following commands (there is a large volume of output and it is saved for debugging purposes):
