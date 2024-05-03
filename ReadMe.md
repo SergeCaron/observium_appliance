@@ -74,7 +74,7 @@ exit	# Exit root
 sudo reboot
 ````
 
-Review the script here: *[Scripts/UpdateAll.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/UpdateAll.sh)*
+Review the script here: *[Scripts/UpdateAll.sh](https://github.com/SergeCaron/observium_appliance/blob/19455a0ae3509b86e2f70b229be102fdd297f375/Scripts/UpdateAll.sh)*
 
 
 
@@ -120,7 +120,7 @@ sudo reboot
 Please be patient... this is a long running install.
 
 
-Review the script here: *[Scripts/InteractiveInstall.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/InteractiveInstall.sh)*
+Review the script here: *[Scripts/InteractiveInstall.sh](https://github.com/SergeCaron/observium_appliance/blob/19455a0ae3509b86e2f70b229be102fdd297f375/Scripts/InteractiveInstall.sh)*
 
 
 Upon reboot, you can access the Observium default web site using (unsecured) HTTP.
@@ -175,7 +175,7 @@ Your service provider will use different tokens, per their own API. The script d
 
 The *apache* virtual host declaration installed by *Observium* is replaced during this operation to allow secure web access. This host declaration reflects the location of the *Let's Encrypt* certificate.
 
-Review this host declaration here: *[Scripts/000-default.conf](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/000-default.conf)*
+Review this host declaration here: *[Scripts/000-default.conf](https://github.com/SergeCaron/observium_appliance/blob/19455a0ae3509b86e2f70b229be102fdd297f375/Scripts/000-default.conf)*
 
 Using SCP, copy the script InteractiveInstall.sh and the 000-default.conf file to the user account home directory :
 
@@ -197,7 +197,7 @@ exit	# Exit root
 A reboot is not necessary. After you adjust your internal DNS server, the Observium web site is accessible using (secure) HTTPS. Unsecure access will be redirected to the secure virtual host.
 
 
-Review the script here: *[Scripts/CertificateInstall.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/CertificateInstall.sh)*
+Review the script here: *[Scripts/CertificateInstall.sh](https://github.com/SergeCaron/observium_appliance/blob/19455a0ae3509b86e2f70b229be102fdd297f375/Scripts/CertificateInstall.sh)*
 
 
 
@@ -283,7 +283,7 @@ chmod +x FinalEmailConfiguration.sh
 exit	# Exit script
 
 ````
-Review the script here:  *[Scripts/FinalEmailConfiguration.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/FinalEmailConfiguration.sh)*
+Review the script here:  *[Scripts/FinalEmailConfiguration.sh](https://github.com/SergeCaron/observium_appliance/blob/19455a0ae3509b86e2f70b229be102fdd297f375/Scripts/FinalEmailConfiguration.sh)*
 
 The output of the script is:
 ````
@@ -450,7 +450,7 @@ You will be prompted for:
 
 The backup completes and displays the "Press any key to continue..." prompt.
 
-Review the script here:  *[Scripts/Backup.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/Backup.sh)*
+Review the script here:  *[Scripts/Backup.sh](https://github.com/SergeCaron/observium_appliance/blob/19455a0ae3509b86e2f70b229be102fdd297f375/Scripts/Backup.sh)*
 
 Note: you can create a backup of this appliance by connecting to itself.
 <details><summary>Here is a sample log invoked by user localadminaccount:</summary>
@@ -540,7 +540,7 @@ Quoting directly from *[Observium's Updating page](https://docs.observium.org/up
 
 *Observium* has device specific migration notes, in particular for *[Linux](https://docs.observium.org/device_linux/)*. During installation, the SNMP package generates a random readonly community name which must be reflected in the configuraton of the device representing the Observium server. This is typically *localhost*. The unique community string is found in */etc/snmp/snmpd.conf* and is updated in the device's property page under *SNMP v1/v2c Authentication*.
 
-Review the script here:  *[Scripts/Restore.sh](https://github.com/SergeCaron/observium_appliance/blob/f7c3afe543a410d8ccf8447607ca682b5df12386/Scripts/Restore.sh)*
+Review the script here:  *[Scripts/Restore.sh](https://github.com/SergeCaron/observium_appliance/blob/19455a0ae3509b86e2f70b229be102fdd297f375/Scripts/Restore.sh)*
 
 # Inplace upgrade to the latest Community Edition
 
